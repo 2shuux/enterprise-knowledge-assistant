@@ -1,0 +1,76 @@
+# Daily development: run ONLY the infrastructure in Docker,
+# and run the backend/frontend natively for instant hot-reload:
+#
+#   docker compose up -d          # postgres + redis + chroma
+#   (terminal 2) cd apps/backend  && uvicorn app.main:app --reload --app-dir src
+#   (terminal 3) cd apps/frontend && npm run dev
+#
+# The fully containerized stack (backend+web behind nginx) is opt-in:
+#
+#   docker compose --profile full up --build
+#
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: eka
+      POSTGRES_PASSWORD: eka
+      POSTGRES_DB: eka
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U eka"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  chroma:
+    image: chromadb/chroma:0.6.3
+    ports:
+      - "8001:8000"   # host 8001 → container 8000 (backend dev server owns host 8000)
+    volumes:
+      - chroma-data:/chroma/chroma
+
+  # ---------- opt-in full stack (--profile full) ----------
+  backend:
+    profiles: ["full"]
+    build:
+      context: .
+      dockerfile: docker/backend.Dockerfile
+    environment:
+      APP_ENV: production
+      DATABASE_URL: postgresql+asyncpg://eka:eka@postgres:5432/eka
+      REDIS_URL: redis://redis:6379/0
+      CHROMA_HOST: chroma
+      CHROMA_PORT: 8000
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  web:
+    profiles: ["full"]
+    build:
+      context: .
+      dockerfile: docker/frontend.Dockerfile
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
+  chroma-data:
