@@ -7,9 +7,6 @@ and streaming responses.
 **Stack:** React 19 · TypeScript · MUI · React Query | FastAPI · SQLAlchemy ·
 PostgreSQL · ChromaDB · Redis | Gemini (swappable LLM provider) | Docker · GitHub Actions
 
-> 🚧 In active development. Current status: **Milestone 0 — foundation** ✅
-> See [docs/architecture.md](docs/architecture.md) for the full design and roadmap.
-
 ## Quickstart (development)
 
 Prereqs: Docker (or Colima), Python 3.12+, Node 20+.
