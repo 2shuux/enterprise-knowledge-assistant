@@ -20,6 +20,7 @@ cd apps/backend
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements-dev.txt
 cp ../../.env.example .env        # then edit .env with your keys
+alembic upgrade head              # apply database migrations
 uvicorn app.main:app --reload --app-dir src
 
 # 3. frontend (terminal 3)

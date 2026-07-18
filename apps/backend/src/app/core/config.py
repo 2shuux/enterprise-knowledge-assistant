@@ -24,6 +24,13 @@ class Settings(BaseSettings):
     chroma_host: str = "localhost"
     chroma_port: int = 8001
 
+    # --- Auth (Milestone 1) ---
+    jwt_secret: str = "dev-secret-change-me-in-production"
+    jwt_algorithm: str = "HS256"
+    access_token_minutes: int = 15
+    refresh_token_days: int = 7
+    first_user_is_admin: bool = True  # bootstrap: first registered account becomes ADMIN
+
     # --- AI providers (used from Milestone 2 onwards) ---
     llm_provider: str = "gemini"  # gemini | openai | anthropic
     gemini_api_key: str = ""
