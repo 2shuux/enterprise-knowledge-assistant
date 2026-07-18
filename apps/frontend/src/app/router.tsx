@@ -1,4 +1,5 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { Chat } from "../pages/Chat";
 import { ComingSoon } from "../pages/ComingSoon";
 import { Documents } from "../pages/Documents";
 import { Landing } from "../pages/Landing";
@@ -19,7 +20,7 @@ export function AppRouter() {
         {/* authenticated */}
         <Route element={<RequireAuth />}>
           <Route element={<AppLayout />}>
-            <Route path="/chat" element={<ComingSoon feature="AI Chat" milestone="M3–M4" />} />
+            <Route path="/chat" element={<Chat />} />
             <Route path="/documents" element={<Documents />} />
             <Route path="/search" element={<ComingSoon feature="Hybrid Search" milestone="M5" />} />
 

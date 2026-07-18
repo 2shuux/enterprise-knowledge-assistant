@@ -16,6 +16,7 @@ class VectorRecord:
 class VectorHit:
     id: str
     score: float  # cosine similarity, 1.0 = identical
+    text: str
     metadata: dict
 
 

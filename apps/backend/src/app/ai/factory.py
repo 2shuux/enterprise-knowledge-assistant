@@ -5,6 +5,8 @@ from functools import lru_cache
 
 from app.ai.embeddings.base import EmbeddingProvider
 from app.ai.embeddings.gemini import GeminiEmbeddingProvider
+from app.ai.llm.base import LLMProvider
+from app.ai.llm.gemini import GeminiLLMProvider
 from app.ai.vectorstore.base import VectorStore
 from app.ai.vectorstore.chroma import ChromaVectorStore
 from app.core.config import get_settings
@@ -22,3 +24,9 @@ def get_embedding_provider() -> EmbeddingProvider:
 def get_vector_store() -> VectorStore:
     settings = get_settings()
     return ChromaVectorStore(host=settings.chroma_host, port=settings.chroma_port)
+
+
+@lru_cache
+def get_llm_provider() -> LLMProvider:
+    settings = get_settings()
+    return GeminiLLMProvider(api_key=settings.gemini_api_key, model=settings.chat_model)
