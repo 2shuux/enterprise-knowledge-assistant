@@ -1,5 +1,6 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { ComingSoon } from "../pages/ComingSoon";
+import { Documents } from "../pages/Documents";
 import { Landing } from "../pages/Landing";
 import { Login } from "../pages/Login";
 import { Register } from "../pages/Register";
@@ -19,7 +20,7 @@ export function AppRouter() {
         <Route element={<RequireAuth />}>
           <Route element={<AppLayout />}>
             <Route path="/chat" element={<ComingSoon feature="AI Chat" milestone="M3–M4" />} />
-            <Route path="/documents" element={<ComingSoon feature="Document Library" milestone="M2" />} />
+            <Route path="/documents" element={<Documents />} />
             <Route path="/search" element={<ComingSoon feature="Hybrid Search" milestone="M5" />} />
 
             {/* admin-only */}

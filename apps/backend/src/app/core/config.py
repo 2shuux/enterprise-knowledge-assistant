@@ -34,6 +34,13 @@ class Settings(BaseSettings):
     # --- AI providers (used from Milestone 2 onwards) ---
     llm_provider: str = "gemini"  # gemini | openai | anthropic
     gemini_api_key: str = ""
+    embedding_model: str = "gemini-embedding-001"
+
+    # --- Ingestion (Milestone 2) ---
+    upload_dir: str = "./uploads"
+    max_upload_bytes: int = 50 * 1024 * 1024  # 50 MB
+    chunk_size_chars: int = 3200   # ~800 tokens (≈4 chars/token)
+    chunk_overlap_chars: int = 480  # ~120 tokens
 
     @property
     def is_production(self) -> bool:
