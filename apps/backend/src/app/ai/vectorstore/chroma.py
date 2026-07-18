@@ -39,13 +39,22 @@ class ChromaVectorStore:
 
     async def query(self, embedding: list[float], k: int) -> list[VectorHit]:
         result = await asyncio.to_thread(
-            self._collection.query, query_embeddings=[embedding], n_results=k
+            self._collection.query,
+            query_embeddings=[embedding],
+            n_results=k,
+            include=["distances", "metadatas", "documents"],
         )
         hits: list[VectorHit] = []
-        for id_, distance, meta in zip(
-            result["ids"][0], result["distances"][0], result["metadatas"][0], strict=True
+        for id_, distance, meta, text in zip(
+            result["ids"][0],
+            result["distances"][0],
+            result["metadatas"][0],
+            result["documents"][0],
+            strict=True,
         ):
-            hits.append(VectorHit(id=id_, score=1.0 - distance, metadata=meta or {}))
+            hits.append(
+                VectorHit(id=id_, score=1.0 - distance, text=text or "", metadata=meta or {})
+            )
         return hits
 
     async def delete_by_document(self, document_id: str) -> None:

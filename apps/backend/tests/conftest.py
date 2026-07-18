@@ -20,7 +20,12 @@ import shutil  # noqa: E402
 import pytest  # noqa: E402
 from fastapi.testclient import TestClient  # noqa: E402
 
-from app.ai.factory import get_embedding_provider, get_vector_store  # noqa: E402
+from app.ai.factory import (  # noqa: E402
+    get_embedding_provider,
+    get_llm_provider,
+    get_vector_store,
+)
+from app.ai.llm.base import Completion  # noqa: E402
 from app.ai.vectorstore.base import VectorHit  # noqa: E402
 from app.core.database import get_engine  # noqa: E402
 from app.main import create_app  # noqa: E402
@@ -53,7 +58,7 @@ class FakeVectorStore:
 
     async def query(self, embedding, k):
         return [
-            VectorHit(id=r.id, score=0.9, metadata=r.metadata)
+            VectorHit(id=r.id, score=0.9, text=r.text, metadata=r.metadata)
             for r in list(self.records.values())[:k]
         ]
 
@@ -63,6 +68,27 @@ class FakeVectorStore:
             for rid, r in self.records.items()
             if r.metadata.get("document_id") != document_id
         }
+
+
+class FakeLLMProvider:
+    """Canned grounded answer citing chunks [1] and [2]."""
+
+    def __init__(self):
+        self.calls: list[dict] = []
+
+    async def complete(self, system, user):
+        self.calls.append({"system": system, "user": user})
+        return Completion(
+            text="Employees receive 20 days of leave per year [1]. "
+            "Unused days may carry over [2].",
+            prompt_tokens=100,
+            completion_tokens=25,
+        )
+
+
+@pytest.fixture()
+def fake_llm():
+    return FakeLLMProvider()
 
 
 @pytest.fixture()
@@ -76,7 +102,7 @@ def fake_store():
 
 
 @pytest.fixture()
-def client(fake_embedder, fake_store):
+def client(fake_embedder, fake_store, fake_llm):
     async def _create_all():
         async with get_engine().begin() as conn:
             await conn.run_sync(Base.metadata.drop_all)
@@ -86,6 +112,7 @@ def client(fake_embedder, fake_store):
     app = create_app()
     app.dependency_overrides[get_embedding_provider] = lambda: fake_embedder
     app.dependency_overrides[get_vector_store] = lambda: fake_store
+    app.dependency_overrides[get_llm_provider] = lambda: fake_llm
     with TestClient(app) as c:
         yield c
 

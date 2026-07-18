@@ -35,6 +35,10 @@ class Settings(BaseSettings):
     llm_provider: str = "gemini"  # gemini | openai | anthropic
     gemini_api_key: str = ""
     embedding_model: str = "gemini-embedding-001"
+    chat_model: str = "gemini-2.5-flash"
+
+    # --- RAG (Milestone 3) ---
+    retrieval_k: int = 6  # chunks fed to the LLM per question
 
     # --- Ingestion (Milestone 2) ---
     upload_dir: str = "./uploads"
